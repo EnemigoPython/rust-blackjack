@@ -8,4 +8,9 @@ mod tests {
     fn create_card() {
         deck_tests::create_card();
     }
+
+    #[test]
+    fn create_deck() {
+        deck_tests::create_deck();
+    }
 }

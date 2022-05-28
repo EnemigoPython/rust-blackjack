@@ -1,7 +1,6 @@
 use std::fmt;
 
-#[derive(PartialEq)]
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 enum Value {
     Spades(u8),
     Clubs(u8),
@@ -9,7 +8,18 @@ enum Value {
     Diamonds(u8),
 }
 
-pub struct Card {
+impl Value {
+    fn match_enum(suite: &str, numeric_val: u8) -> Value {
+        match suite {
+            "Spades" => Value::Spades(numeric_val),
+            "Clubs" => Value::Clubs(numeric_val),
+            "Hearts" => Value::Hearts(numeric_val),
+            _ => Value::Diamonds(numeric_val),
+        }
+    }
+}
+
+struct Card {
     value: Value,
     name: String,
 }
@@ -31,6 +41,27 @@ impl fmt::Display for Card {
     }
 }
 
+struct Deck(Vec<Card>);
+
+impl Deck {
+    const SUITES: [&'static str; 4] = ["Spades", "Clubs", "Hearts", "Diamonds"];
+    const FACE_CARDS: [&'static str; 4] = ["Ace", "King", "Queen", "Jack"];
+
+    fn new() -> Deck {
+        let mut deck = Deck(Vec::new());
+        for suite in Self::SUITES.iter() {
+            for face_card in Self::FACE_CARDS.iter() {
+                deck.0.push(Card { 
+                    value: Value::match_enum(suite, 10),
+                    name: String::from(*face_card),
+                });
+            }
+        }
+
+        deck
+    }
+}
+
 
 #[allow(unused)]
 pub mod tests {
@@ -43,5 +74,9 @@ pub mod tests {
         let second_card = Card::new(Value::Spades(10), "Ace");
         assert_eq!(format!("{second_card}"), "Ace of Spades");
         assert_ne!(first_card.value, second_card.value);
+    }
+
+    pub fn create_deck() {
+        let deck = Deck::new();
     }
 }
