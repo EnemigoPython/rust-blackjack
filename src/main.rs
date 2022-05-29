@@ -1,6 +1,6 @@
 mod deck;
 
 fn main() {
-    println!("Hello, world!");
-    // let x = deck::Card::new();
+    // let x = deck::Card::new(deck::Value::Clubs(5), "5");
+    // println!("{:?}", x.value);
 }

@@ -1,8 +1,10 @@
 mod deck;
+mod player;
 
 #[cfg(test)]
 mod tests {
     use super::deck::tests as deck_tests;
+    use super::player::tests as player_tests;
 
     #[test]
     fn create_card() {
@@ -22,5 +24,10 @@ mod tests {
     #[test]
     fn deal_from_deck() {
         deck_tests::deal_from_deck();
+    }
+
+    #[test]
+    fn create_player() {
+        player_tests::create_player();
     }
 }

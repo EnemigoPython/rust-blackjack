@@ -55,7 +55,7 @@ impl Deck {
         for suite in Self::SUITES.iter() {
             for face_card in Self::FACE_CARDS.iter() {
                 deck.0.push(Card { 
-                    value: Value::match_enum(suite, 10),
+                    value: Value::match_enum(suite, if *face_card == "Ace" { 11 } else { 10 }),
                     name: String::from(*face_card),
                 });
             }
@@ -108,6 +108,7 @@ pub mod tests {
         assert_eq!(deck.0[0].name, "Ace");
         assert_eq!(format!("{}", deck.0[0]), "Ace of Spades");
         assert_eq!(deck.0.len(), 52);
+        assert_eq!(deck.0[0].value, Value::Spades(11));
         assert_eq!(deck.0[4].value, Value::Spades(10));
     }
 
@@ -134,5 +135,6 @@ pub mod tests {
             Card { value: Value::Diamonds(4), name: String::from("4") },
         ]);
         assert_eq!(deck.0.len(), 49);
+        assert_ne!(dealt_cards[2], deck.0[48]);
     }
 }
