@@ -22,7 +22,7 @@ impl Value {
 }
 
 #[derive(Debug, PartialEq)]
-struct Card {
+pub struct Card {
     value: Value,
     name: String,
 }
@@ -30,6 +30,23 @@ struct Card {
 impl Card {
     fn new(value: Value, name: &str) -> Card {
         Card { value, name: String::from(name) }
+    }
+
+    pub fn numeric_value(&self) -> u8 {
+        match self.value {
+            Value::Spades(n) => n,
+            Value::Clubs(n) => n,
+            Value::Hearts(n) => n,
+            Value::Diamonds(n) => n,
+        }
+    }
+
+    pub fn _test_hand() -> Vec<Card> {
+        vec![
+            Card { value: Value::Spades(11), name: String::from("Ace") },
+            Card { value: Value::Diamonds(6), name: String::from("6") },
+            Card { value: Value::Spades(10), name: String::from("King") },
+        ]
     }
 }
 
@@ -44,13 +61,13 @@ impl fmt::Display for Card {
     }
 }
 
-struct Deck(Vec<Card>);
+pub struct Deck(Vec<Card>);
 
 impl Deck {
     const SUITES: [&'static str; 4] = ["Spades", "Clubs", "Hearts", "Diamonds"];
     const FACE_CARDS: [&'static str; 4] = ["Ace", "King", "Queen", "Jack"];
 
-    fn new() -> Deck {
+    pub fn new() -> Deck {
         let mut deck = Deck(Vec::new());
         for suite in Self::SUITES.iter() {
             for face_card in Self::FACE_CARDS.iter() {
@@ -71,12 +88,12 @@ impl Deck {
         deck
     }
 
-    fn shuffle(&mut self) {
+    pub fn shuffle(&mut self) {
         let mut rng = thread_rng();
         self.0.shuffle(&mut rng);
     }
 
-    fn deal(&mut self, n: usize) -> Vec<Card> {
+    pub fn deal(&mut self, n: usize) -> Vec<Card> {
         let mut _vec = Vec::new();
         for _ in 0..n {
             match self.0.pop() {
@@ -98,7 +115,8 @@ pub mod tests {
         let first_card = Card::new(Value::Spades(5), "5");
         assert_eq!(first_card.value, Value::Spades(5));
         assert_eq!(first_card.name, "5");
-        let second_card = Card::new(Value::Spades(10), "Ace");
+        assert_eq!(first_card.numeric_value(), 5);
+        let second_card = Card::new(Value::Spades(11), "Ace");
         assert_eq!(format!("{second_card}"), "Ace of Spades");
         assert_ne!(first_card.value, second_card.value);
     }

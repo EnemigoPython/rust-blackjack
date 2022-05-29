@@ -30,4 +30,9 @@ mod tests {
     fn create_player() {
         player_tests::create_player();
     }
+
+    #[test]
+    fn deal_player_cards() {
+        player_tests::deal_player_cards();
+    }
 }
