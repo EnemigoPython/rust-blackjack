@@ -58,6 +58,10 @@ impl Pot {
     fn new() -> Pot {
         Pot(0)
     }
+
+    pub fn curr(&self) -> u32 {
+        self.0
+    }
 }
 
 
@@ -96,5 +100,9 @@ pub mod tests {
         assert_eq!(dealer_bet_result, Err("Program tried to bet as a dealer"));
         let legal_bet_result = player.bet(&mut pot, 10);
         assert_eq!(legal_bet_result, Ok(10));
+        assert_eq!(pot.curr(), 10);
+        assert_eq!(player.chips, Some(10));
+        player.bet(&mut pot, 10);
+        assert_eq!(player.chips, Some(0));
     }
 }
