@@ -2,12 +2,15 @@ use crate::deck::{ Card, Deck };
 
 struct Player {
     hand: Vec<Card>,
-    chips: u32,
+    chips: Option<u32>,
 }
 
 impl Player {
-    fn new(starting_chips: u32) -> Player {
-        Player { hand: Vec::new(), chips: starting_chips }
+    fn new(starting_chips: u32, dealer: bool) -> Player {
+        Player { 
+            hand: Vec::new(), 
+            chips: if dealer { None } else { Some(starting_chips) }, 
+        }
     }
 
     fn get_cards(&mut self, deck: &mut Deck, n: usize) {
@@ -42,14 +45,16 @@ pub mod tests {
     use super::*;
 
     pub fn create_player() {
-        let mut player = Player::new(20);
-        assert_eq!(player.chips, 20);
-        player.chips *= 2;
-        assert_eq!(player.chips, 40);
+        let mut player = Player::new(20, false);
+        assert_eq!(player.chips, Some(20));
+        if let Some(chips) = player.chips.as_mut() {
+            *chips *= 2;
+        } 
+        assert_eq!(player.chips, Some(40));
     }
 
     pub fn deal_player_cards() {
-        let mut player = Player::new(20);
+        let mut player = Player::new(20, false);
         let mut deck = Deck::new();
         player.get_cards(&mut deck, 3);
         assert_eq!(player.hand.len(), 3);
