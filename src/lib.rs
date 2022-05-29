@@ -35,4 +35,9 @@ mod tests {
     fn deal_player_cards() {
         player_tests::deal_player_cards();
     }
+
+    #[test]
+    fn make_bet() {
+        player_tests::make_bet();
+    }
 }
