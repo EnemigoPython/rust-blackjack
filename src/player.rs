@@ -18,6 +18,7 @@ impl Player {
     }
 
     fn has_ace(&self) -> bool {
+        // TODO: You can have multiple aces, right? This doesn't quite cover it
         let has_ace = self.hand.iter()
             .map(|x| x.numeric_value())
             .find(|&x| x == 11);
