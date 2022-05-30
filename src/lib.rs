@@ -1,5 +1,6 @@
 mod deck;
 mod player;
+mod io;
 
 #[cfg(test)]
 mod tests {

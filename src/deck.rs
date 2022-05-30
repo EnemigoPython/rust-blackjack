@@ -54,12 +54,25 @@ impl Card {
                 Card { value: Value::Spades(11), name: String::from("Ace") },
                 Card { value: Value::Spades(10), name: String::from("King") },
             ],
-            _ =>
+            2 =>
             vec![
                 Card { value: Value::Spades(11), name: String::from("Ace") },
                 Card { value: Value::Diamonds(6), name: String::from("6") },
                 Card { value: Value::Spades(10), name: String::from("King") },
                 Card { value: Value::Hearts(11), name: String::from("Ace") },
+            ],
+            3 =>
+            vec![
+                Card { value: Value::Spades(10), name: String::from("King") },
+                Card { value: Value::Diamonds(6), name: String::from("6") },
+                Card { value: Value::Hearts(10), name: String::from("King") },
+            ],
+            _ =>
+            vec![
+                Card { value: Value::Spades(10), name: String::from("King") },
+                Card { value: Value::Diamonds(6), name: String::from("6") },
+                Card { value: Value::Spades(10), name: String::from("Queen") },
+                Card { value: Value::Clubs(11), name: String::from("Ace") },
             ],
         }
     }

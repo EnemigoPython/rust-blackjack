@@ -1,6 +1,9 @@
 mod deck;
+mod player;
+mod io;
 
 fn main() {
-    // let x = deck::Card::new(deck::Value::Clubs(5), "5");
-    // println!("{:?}", x.value);
+    while let Ok(n) = io::get_user_int::<u8>(Some("")) {
+
+    }
 }

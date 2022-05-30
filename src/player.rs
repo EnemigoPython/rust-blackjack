@@ -84,8 +84,8 @@ pub mod tests {
         assert_eq!(player.hand.len(), 3);
         assert_eq!(format!("{}", player.hand[0]), "2 of Diamonds");
         assert_eq!(player.hand_total(), 9);
-        let test_vals: [u8; 3] = [17, 21, 18];
-        for n in 0..3 {
+        let test_vals: [u8; 5] = [17, 21, 18, 26, 27];
+        for n in 0..5 {
             let hard_hand = Card::_test_hand(n);
             player.hand = hard_hand;
             assert_eq!(player.hand_total(), test_vals[n as usize]);
