@@ -1,7 +1,7 @@
 use std::io as _io;
 use std::str;
 
-pub fn get_user_str(prompt: Option<&str>) -> String {
+fn get_user_str(prompt: Option<&str>) -> String {
     match prompt {
         Some(s) => println!("{}", s),
         None => (),
@@ -16,10 +16,23 @@ pub fn get_user_str(prompt: Option<&str>) -> String {
     input
 }
 
-pub fn get_user_int<T>(prompt: Option<&str>) -> Result<T, <T as str::FromStr>::Err>
+fn get_user_int<T>(prompt: Option<&str>) -> T
     where T: str::FromStr
 {
-    get_user_str(prompt)
+    let res = get_user_str(prompt)
         .trim()
-        .parse::<T>()
+        .parse::<T>();
+    match res {
+        Ok(n) => n,
+        Err(_) => get_user_int(prompt),
+    }
+}
+
+pub fn get_clamped_user_int<T>(prompt: Option<&str>, min: T, max: T) -> T
+    where T: str::FromStr + PartialOrd
+{
+    match get_user_int::<T>(prompt) {
+        n if n >= min && n <= max => n,
+        _ => get_clamped_user_int(prompt, min, max),
+    }
 }
