@@ -41,12 +41,27 @@ impl Card {
         }
     }
 
-    pub fn _test_hand() -> Vec<Card> {
-        vec![
-            Card { value: Value::Spades(11), name: String::from("Ace") },
-            Card { value: Value::Diamonds(6), name: String::from("6") },
-            Card { value: Value::Spades(10), name: String::from("King") },
-        ]
+    pub fn _test_hand(n: u8) -> Vec<Card> {
+        match n {
+            0 =>
+            vec![
+                Card { value: Value::Spades(11), name: String::from("Ace") },
+                Card { value: Value::Diamonds(6), name: String::from("6") },
+                Card { value: Value::Spades(10), name: String::from("King") },
+            ],
+            1 => 
+            vec![
+                Card { value: Value::Spades(11), name: String::from("Ace") },
+                Card { value: Value::Spades(10), name: String::from("King") },
+            ],
+            _ =>
+            vec![
+                Card { value: Value::Spades(11), name: String::from("Ace") },
+                Card { value: Value::Diamonds(6), name: String::from("6") },
+                Card { value: Value::Spades(10), name: String::from("King") },
+                Card { value: Value::Hearts(11), name: String::from("Ace") },
+            ],
+        }
     }
 }
 
