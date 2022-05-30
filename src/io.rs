@@ -1,6 +1,6 @@
-use std::io as _io;
-use std::str;
+use std::{ io, str };
 
+#[allow(dead_code)]
 fn get_user_str(prompt: Option<&str>) -> String {
     match prompt {
         Some(s) => println!("{}", s),
@@ -9,13 +9,14 @@ fn get_user_str(prompt: Option<&str>) -> String {
 
     let mut input = String::new();
 
-    _io::stdin()
+    io::stdin()
         .read_line(&mut input)
         .expect("Problem reading input");
 
     input
 }
 
+#[allow(dead_code)]
 fn get_user_int<T>(prompt: Option<&str>) -> T
     where T: str::FromStr
 {
@@ -28,6 +29,7 @@ fn get_user_int<T>(prompt: Option<&str>) -> T
     }
 }
 
+#[allow(dead_code)]
 pub fn get_clamped_user_int<T>(prompt: Option<&str>, min: T, max: T) -> T
     where T: str::FromStr + PartialOrd
 {
