@@ -1,4 +1,5 @@
 use crate::deck::{ Card, Deck };
+use std::cmp;
 
 struct Player {
     hand: Vec<Card>,
@@ -17,26 +18,23 @@ impl Player {
         self.hand.extend(deck.deal(n));
     }
 
-    fn has_ace(&self) -> bool {
-        // TODO: You can have multiple aces, right? This doesn't quite cover it
-        let has_ace = self.hand.iter()
+    fn ace_count(&self) -> u8 {
+        self.hand.iter()
             .map(|x| x.numeric_value())
-            .find(|&x| x == 11);
-        match has_ace {
-            Some(_) => true,
-            None => false,
-        }
+            .filter(|&x| x == 11)
+            .count() as u8
     }
+        
 
-    fn hand_total(&self) -> u8 {
+    pub fn hand_total(&self) -> u8 {
         let base_value: u8 = self.hand.iter()
             .map(|x| x.numeric_value())
             .sum();
-        if base_value > 21 && self.has_ace() {
-            base_value - 10
-        } else {
-            base_value
-        }
+
+        if base_value <= 21 { return base_value }
+
+        let ace_reduction = cmp::min(base_value / 10 + 1, self.ace_count()) * 10;
+        base_value - ace_reduction
     }
 
     fn bet(&mut self, pot: &mut Pot, amount: u32) -> Result<u32, &str> {
