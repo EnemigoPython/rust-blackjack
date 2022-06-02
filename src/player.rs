@@ -1,14 +1,14 @@
 use crate::deck::{ Card, Deck };
 use std::{ fmt, cmp, slice };
 
-struct Player {
-    hand: Vec<Card>,
-    chips: Option<u32>,
+pub struct Player {
+    pub hand: Vec<Card>,
+    pub chips: Option<u32>,
     number: u8,
 }
 
 impl Player {
-    fn new(starting_chips: u32, number: u8) -> Player {
+    pub fn new(starting_chips: u32, number: u8) -> Player {
         Player { 
             hand: Vec::new(), 
             chips: if starting_chips > 0 { Some(starting_chips) } else { None }, 
@@ -16,7 +16,7 @@ impl Player {
         }
     }
 
-    fn get_cards(&mut self, deck: &mut Deck, n: usize) {
+    pub fn get_cards(&mut self, deck: &mut Deck, n: usize) {
         self.hand.extend(deck.deal(n));
     }
 
@@ -59,7 +59,7 @@ impl fmt::Display for Player {
     }
 }
 
-struct PlayerList(Vec<Player>);
+pub struct PlayerList(Vec<Player>);
 
 impl PlayerList {
     pub fn new(n: u8, starting_chips: u32) -> PlayerList {
