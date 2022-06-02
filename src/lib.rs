@@ -41,4 +41,9 @@ mod tests {
     fn make_bet() {
         player_tests::make_bet();
     }
+
+    #[test]
+    fn create_player_list() {
+        player_tests::create_player_list();
+    }
 }

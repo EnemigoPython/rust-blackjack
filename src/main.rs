@@ -29,5 +29,6 @@ fn game_loop(options: (u8, u32)) {
 }
 
 fn main() {
+    println!("Welcome to blackjack!");
     game_loop(init_game_options())
 }

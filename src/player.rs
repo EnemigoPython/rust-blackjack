@@ -1,16 +1,18 @@
 use crate::deck::{ Card, Deck };
-use std::cmp;
+use std::{ fmt, cmp, slice };
 
 struct Player {
     hand: Vec<Card>,
     chips: Option<u32>,
+    number: u8,
 }
 
 impl Player {
-    fn new(starting_chips: u32) -> Player {
+    fn new(starting_chips: u32, number: u8) -> Player {
         Player { 
             hand: Vec::new(), 
             chips: if starting_chips > 0 { Some(starting_chips) } else { None }, 
+            number,
         }
     }
 
@@ -51,6 +53,29 @@ impl Player {
     }
 }
 
+impl fmt::Display for Player {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Player {}", self.number)
+    }
+}
+
+struct PlayerList(Vec<Player>);
+
+impl PlayerList {
+    pub fn new(n: u8, starting_chips: u32) -> PlayerList {
+        let mut player_list = PlayerList(Vec::new());
+        for i in 1..=n {
+            player_list.0.push(Player::new(starting_chips, i));
+        }
+
+        player_list
+    }
+
+    pub fn iter_mut(&mut self) -> slice::IterMut<Player> {
+        self.0.iter_mut()
+    }
+}
+
 struct Pot(u32);
 
 impl Pot {
@@ -73,8 +98,9 @@ pub mod tests {
     use super::*;
 
     pub fn create_player() {
-        let mut player = Player::new(20);
+        let mut player = Player::new(20, 1);
         assert_eq!(player.chips, Some(20));
+        assert_eq!(String::from("Player 1"), format!("{}", player));
         if let Some(chips) = player.chips.as_mut() {
             *chips *= 2;
         } 
@@ -82,7 +108,7 @@ pub mod tests {
     }
 
     pub fn deal_player_cards() {
-        let mut player = Player::new(20);
+        let mut player = Player::new(20, 0);
         let mut deck = Deck::new();
         player.get_cards(&mut deck, 3);
         assert_eq!(player.hand.len(), 3);
@@ -97,11 +123,11 @@ pub mod tests {
     }
 
     pub fn make_bet() {
-        let mut player = Player::new(20);
+        let mut player = Player::new(20, 0);
         let mut pot = Pot::new();
         let overbet_result = player.bet(&mut pot, 30);
         assert_eq!(overbet_result, Err("Program tried to bet more chips than it has"));
-        let mut dealer = Player::new(0);
+        let mut dealer = Player::new(0, 0);
         let dealer_bet_result = dealer.bet(&mut pot, 30);
         assert_eq!(dealer_bet_result, Err("Program tried to bet as a dealer"));
         let legal_bet_result = player.bet(&mut pot, 10);
@@ -110,5 +136,13 @@ pub mod tests {
         assert_eq!(player.chips, Some(10));
         player.bet(&mut pot, 10);
         assert_eq!(player.chips, Some(0));
+    }
+
+    pub fn create_player_list() {
+        let mut player_list = PlayerList::new(5, 100);
+        for (i, player) in player_list.iter_mut().enumerate() {
+            assert_eq!(format!("{}", player), format!("Player {}", i+1));
+            assert_eq!(player.chips, Some(100));
+        }
     }
 }
