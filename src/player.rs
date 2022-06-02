@@ -5,6 +5,7 @@ pub struct Player {
     pub hand: Vec<Card>,
     pub chips: Option<u32>,
     number: u8,
+    pot: Option<u32>,
 }
 
 impl Player {
@@ -13,6 +14,7 @@ impl Player {
             hand: Vec::new(), 
             chips: if starting_chips > 0 { Some(starting_chips) } else { None }, 
             number,
+            pot: if starting_chips > 0 { Some(0) } else { None },
         }
     }
 
@@ -39,7 +41,7 @@ impl Player {
         base_value - ace_reduction
     }
 
-    fn bet(&mut self, pot: &mut Pot, amount: u32) -> Result<u32, &str> {
+    fn bet(&mut self, amount: u32) -> Result<u32, &str> {
         match self.chips {
             Some(n) if amount > n => return Err("Program tried to bet more chips than it has"),
             None => return Err("Program tried to bet as a dealer"),
@@ -47,8 +49,10 @@ impl Player {
         }
         if let Some(chips) = self.chips.as_mut() {
             *chips -= amount;
+        }
+        if let Some(pot) = self.pot.as_mut() {
+            *pot += amount;
         } 
-        pot.0 += amount;
         Ok(amount)
     }
 }
@@ -73,22 +77,6 @@ impl PlayerList {
 
     pub fn iter_mut(&mut self) -> slice::IterMut<Player> {
         self.0.iter_mut()
-    }
-}
-
-struct Pot(u32);
-
-impl Pot {
-    fn new() -> Pot {
-        Pot(0)
-    }
-
-    pub fn curr(&self) -> u32 {
-        self.0
-    }
-
-    fn reset(&mut self) {
-        self.0 = 0;
     }
 }
 
@@ -124,17 +112,16 @@ pub mod tests {
 
     pub fn make_bet() {
         let mut player = Player::new(20, 0);
-        let mut pot = Pot::new();
-        let overbet_result = player.bet(&mut pot, 30);
+        let overbet_result = player.bet(30);
         assert_eq!(overbet_result, Err("Program tried to bet more chips than it has"));
         let mut dealer = Player::new(0, 0);
-        let dealer_bet_result = dealer.bet(&mut pot, 30);
+        let dealer_bet_result = dealer.bet(30);
         assert_eq!(dealer_bet_result, Err("Program tried to bet as a dealer"));
-        let legal_bet_result = player.bet(&mut pot, 10);
+        let legal_bet_result = player.bet(10);
         assert_eq!(legal_bet_result, Ok(10));
-        assert_eq!(pot.curr(), 10);
+        assert_eq!(player.pot, Some(10));
         assert_eq!(player.chips, Some(10));
-        player.bet(&mut pot, 10);
+        player.bet(10);
         assert_eq!(player.chips, Some(0));
     }
 

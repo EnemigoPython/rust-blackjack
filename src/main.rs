@@ -46,7 +46,7 @@ fn game_loop(options: (u8, u32, u32)) {
             println!("\n{}'s turn:", player);
             let bet = get_clamped_user_int(
                 Some(&format!("How much would you like to bet? (minimum bet {})", min_bet)), 
-                0, 
+                min_bet, 
                 player.chips.unwrap(),
             );
             player.get_cards(&mut deck, 2);
