@@ -40,14 +40,17 @@ fn game_loop(options: (u8, u32, u32)) {
         round += 1;
         println!("\nRound {}", round);
         for player in player_list.iter_mut() {
-            let bet = get_clamped_user_int(
-                Some(&format!("{}, how much would you like to bet? (minimum bet {})", player, min_bet)), 
-                min_bet, 
-                player.chips.unwrap(),
-            );
+            println!("\n{} to bet, chips: {}", player, player.chips.unwrap());
+            let bet = match player.chips.unwrap() {
+                n if n <= min_bet => n,
+                _ => get_clamped_user_int(
+                    Some(&format!("How much would you like to bet? (minimum bet {})", min_bet)), 
+                    min_bet, 
+                    player.chips.unwrap(),
+                )
+            };
             player.bet(bet).unwrap();
         }
-        
         let mut deck = Deck::new();
         deck.shuffle();
         dealer.get_cards(&mut deck, 2);
@@ -56,7 +59,6 @@ fn game_loop(options: (u8, u32, u32)) {
             println!("\n{}'s turn:", player);
             println!("Your cards: {}, {}", player.hand[0], player.hand[1]);
             println!("Dealer upcard: {}", dealer.hand[0]);
-            println!("Your chips: {}", player.chips.unwrap());
             loop {
                 match get_clamped_user_int(
                     Some(&format!("Type 1 to Hit, 0 to Stand")), 
@@ -75,8 +77,11 @@ fn game_loop(options: (u8, u32, u32)) {
                 }
             }
         }
-        break;
+        if !player_list.players_left() { 
+            break;
+        }
     }
+    println!("\n Thanks for playing!");
 }
 
 fn main() {

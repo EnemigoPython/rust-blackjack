@@ -58,6 +58,14 @@ impl Player {
         } 
         Ok(amount)
     }
+
+    pub fn is_broke(&self) -> bool {
+        self.chips == Some(0)
+    }
+
+    pub fn dealer_turn(&self) {
+        
+    }
 }
 
 impl fmt::Display for Player {
@@ -80,6 +88,10 @@ impl PlayerList {
 
     pub fn iter_mut(&mut self) -> slice::IterMut<Player> {
         self.0.iter_mut()
+    }
+
+    pub fn players_left(&self) -> bool {
+        self.0.len() > 0
     }
 }
 
@@ -135,5 +147,6 @@ pub mod tests {
             assert_eq!(format!("{}", player), format!("Player {}", i+1));
             assert_eq!(player.chips, Some(100));
         }
+        assert_eq!(true, player_list.players_left());
     }
 }
