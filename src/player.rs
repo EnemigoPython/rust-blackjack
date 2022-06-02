@@ -28,7 +28,10 @@ impl Player {
             .filter(|&x| x == 11)
             .count() as u8
     }
-        
+
+    pub fn latest_card(&self) -> &Card {
+        &self.hand[self.hand.len()-1]
+    }
 
     pub fn hand_total(&self) -> u8 {
         let base_value: u8 = self.hand.iter()
@@ -41,7 +44,7 @@ impl Player {
         base_value - ace_reduction
     }
 
-    fn bet(&mut self, amount: u32) -> Result<u32, &str> {
+    pub fn bet(&mut self, amount: u32) -> Result<u32, &str> {
         match self.chips {
             Some(n) if amount > n => return Err("Program tried to bet more chips than it has"),
             None => return Err("Program tried to bet as a dealer"),
@@ -108,6 +111,7 @@ pub mod tests {
             player.hand = hard_hand;
             assert_eq!(player.hand_total(), test_vals[n as usize]);
         }
+        assert_eq!(player.latest_card(), &Card::_last_card())
     }
 
     pub fn make_bet() {

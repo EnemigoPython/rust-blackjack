@@ -37,22 +37,43 @@ fn game_loop(options: (u8, u32, u32)) {
     let mut round = 0;
     println!("Good luck!");
     loop {
-        let mut deck = Deck::new();
-        deck.shuffle();
-        dealer.get_cards(&mut deck, 2);
         round += 1;
         println!("\nRound {}", round);
         for player in player_list.iter_mut() {
-            println!("\n{}'s turn:", player);
             let bet = get_clamped_user_int(
-                Some(&format!("How much would you like to bet? (minimum bet {})", min_bet)), 
+                Some(&format!("{}, how much would you like to bet? (minimum bet {})", player, min_bet)), 
                 min_bet, 
                 player.chips.unwrap(),
             );
+            player.bet(bet).unwrap();
+        }
+        
+        let mut deck = Deck::new();
+        deck.shuffle();
+        dealer.get_cards(&mut deck, 2);
+        for player in player_list.iter_mut() {
             player.get_cards(&mut deck, 2);
+            println!("\n{}'s turn:", player);
             println!("Your cards: {}, {}", player.hand[0], player.hand[1]);
             println!("Dealer upcard: {}", dealer.hand[0]);
             println!("Your chips: {}", player.chips.unwrap());
+            loop {
+                match get_clamped_user_int(
+                    Some(&format!("Type 1 to Hit, 0 to Stand")), 
+                    0, 
+                    1,
+                ) {
+                    1 => {
+                        player.get_cards(&mut deck, 1);
+                        println!("{}", player.latest_card());
+                        if player.hand_total() > 21 {
+                            println!("You went bust!");
+                            break;
+                        }
+                    },
+                    _ => break,
+                }
+            }
         }
         break;
     }

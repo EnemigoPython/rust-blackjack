@@ -76,6 +76,10 @@ impl Card {
             ],
         }
     }
+
+    pub fn _last_card() -> Card {
+        Card { value: Value::Clubs(11), name: String::from("Ace") }
+    }
 }
 
 impl fmt::Display for Card {
