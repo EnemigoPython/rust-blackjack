@@ -61,6 +61,10 @@ impl Pot {
     pub fn curr(&self) -> u32 {
         self.0
     }
+
+    fn reset(&mut self) {
+        self.0 = 0;
+    }
 }
 
 
