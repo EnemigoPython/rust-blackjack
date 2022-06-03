@@ -121,6 +121,10 @@ impl Player {
         self.pot.unwrap() > 0
     }
 
+    pub fn has_blackjack(&self) -> bool {
+        self.hand_total() == 21 && self.hand.len() == 2
+    }
+
     pub fn is_broke(&self) -> bool {
         self.chips.unwrap() == 0
     }
