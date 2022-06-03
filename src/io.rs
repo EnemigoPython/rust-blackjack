@@ -1,3 +1,4 @@
+use crate::player::Player;
 use std::{ io, str };
 
 #[allow(dead_code)]
@@ -37,4 +38,9 @@ pub fn get_clamped_user_int<T>(prompt: Option<&str>, min: T, max: T) -> T
         n if n >= min && n <= max => n,
         _ => get_clamped_user_int(prompt, min, max),
     }
+}
+
+#[allow(dead_code)]
+pub fn get_user_options(player: &mut Player) {
+
 }

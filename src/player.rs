@@ -1,6 +1,14 @@
 use crate::deck::{ Card, Deck };
 use std::{ fmt, cmp, slice };
 
+pub enum ValidMoves {
+    Hit,
+    Stand,
+    Surrender,
+    Split,
+    DoubleDown,
+}
+
 pub struct Player {
     pub hand: Vec<Card>,
     pub chips: Option<u32>,
@@ -20,6 +28,22 @@ impl Player {
 
     pub fn get_cards(&mut self, deck: &mut Deck, n: usize) {
         self.hand.extend(deck.deal(n));
+    }
+
+    pub fn valid_moves(&self) -> Vec<ValidMoves> {
+        assert!(self.hand_total() <= 21, "Tried to find moves for a busted player");
+        let mut valid_moves = vec![ValidMoves::Hit, ValidMoves::Stand];
+        if self.hand.len() == 2 {
+            valid_moves.push(ValidMoves::Surrender);
+            if self.chips >= self.pot {
+                valid_moves.push(ValidMoves::DoubleDown);
+            }
+            if self.hand[0].numeric_value() == self.hand[1].numeric_value() {
+                valid_moves.push(ValidMoves::Split);
+            }
+        }
+
+        valid_moves
     }
 
     fn ace_count(&self) -> u8 {
@@ -59,12 +83,8 @@ impl Player {
         Ok(amount)
     }
 
-    pub fn is_broke(&self) -> bool {
+    pub fn is_busted(&self) -> bool {
         self.chips == Some(0)
-    }
-
-    pub fn dealer_turn(&self) {
-        
     }
 }
 
@@ -137,8 +157,10 @@ pub mod tests {
         assert_eq!(legal_bet_result, Ok(10));
         assert_eq!(player.pot, Some(10));
         assert_eq!(player.chips, Some(10));
+        assert_ne!(player.is_busted(), true);
         player.bet(10);
         assert_eq!(player.chips, Some(0));
+        assert_eq!(player.is_busted(), true);
     }
 
     pub fn create_player_list() {

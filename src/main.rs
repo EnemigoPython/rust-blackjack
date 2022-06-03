@@ -61,7 +61,7 @@ fn game_loop(options: (u8, u32, u32)) {
             println!("Dealer upcard: {}", dealer.hand[0]);
             loop {
                 match get_clamped_user_int(
-                    Some(&format!("Type 1 to Hit, 0 to Stand")), 
+                    Some("Type 1 to Hit, 0 to Stand"), 
                     0, 
                     1,
                 ) {
@@ -77,11 +77,30 @@ fn game_loop(options: (u8, u32, u32)) {
                 }
             }
         }
+        println!("Dealer shows the {}", dealer.hand[1]);
+        while dealer.hand_total() < 17 {
+            dealer.get_cards(&mut deck, 1);
+            println!("Dealer gets the {}", dealer.latest_card());
+            if dealer.hand_total() > 21 {
+                println!("Dealer busts!");
+            }
+        }
+        for player in player_list.iter_mut() {
+            match dealer.hand_total() {
+                n if n > 21 || n < player.hand_total() => {
+
+                },
+                n if n == player.hand_total() => {
+
+                },
+                _ => (),
+            }
+        }
         if !player_list.players_left() { 
             break;
         }
     }
-    println!("\n Thanks for playing!");
+    println!("\nThanks for playing!");
 }
 
 fn main() {
