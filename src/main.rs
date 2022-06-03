@@ -3,7 +3,7 @@ mod player;
 mod io;
 
 use deck::Deck;
-use player::{ Player, PlayerList };
+use player::{ Player, PlayerList, ValidMove };
 use io::get_clamped_user_int;
 
 const MAX_PLAYERS: u8 = 8;

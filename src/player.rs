@@ -1,11 +1,11 @@
 use crate::deck::{ Card, Deck };
 use std::{ fmt, cmp, slice };
 
-pub enum ValidMoves {
+#[derive(Clone)]
+pub enum ValidMove {
     Hit,
     Stand,
     Surrender,
-    Split,
     DoubleDown,
 }
 
@@ -30,16 +30,13 @@ impl Player {
         self.hand.extend(deck.deal(n));
     }
 
-    pub fn valid_moves(&self) -> Vec<ValidMoves> {
+    pub fn valid_moves(&self) -> Vec<ValidMove> {
         assert!(self.hand_total() <= 21, "Tried to find moves for a busted player");
-        let mut valid_moves = vec![ValidMoves::Hit, ValidMoves::Stand];
+        let mut valid_moves = vec![ValidMove::Hit, ValidMove::Stand];
         if self.hand.len() == 2 {
-            valid_moves.push(ValidMoves::Surrender);
+            valid_moves.push(ValidMove::Surrender);
             if self.chips >= self.pot {
-                valid_moves.push(ValidMoves::DoubleDown);
-            }
-            if self.hand[0].numeric_value() == self.hand[1].numeric_value() {
-                valid_moves.push(ValidMoves::Split);
+                valid_moves.push(ValidMove::DoubleDown);
             }
         }
 
