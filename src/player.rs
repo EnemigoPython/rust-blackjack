@@ -1,8 +1,8 @@
 use crate::deck::{ Card, Deck };
 use std::{ fmt, cmp, slice };
 
-#[derive(Clone)]
-pub enum ValidMove {
+#[derive(Clone, PartialEq)]
+pub enum Action {
     Hit,
     Stand,
     Surrender,
@@ -30,13 +30,13 @@ impl Player {
         self.hand.extend(deck.deal(n));
     }
 
-    pub fn valid_moves(&self) -> Vec<ValidMove> {
+    pub fn valid_moves(&self) -> Vec<Action> {
         assert!(self.hand_total() <= 21, "Tried to find moves for a busted player");
-        let mut valid_moves = vec![ValidMove::Hit, ValidMove::Stand];
+        let mut valid_moves = vec![Action::Hit, Action::Stand];
         if self.hand.len() == 2 {
-            valid_moves.push(ValidMove::Surrender);
+            valid_moves.push(Action::Surrender);
             if self.chips >= self.pot {
-                valid_moves.push(ValidMove::DoubleDown);
+                valid_moves.push(Action::DoubleDown);
             }
         }
 
@@ -141,6 +141,22 @@ pub mod tests {
             assert_eq!(player.hand_total(), test_vals[n as usize]);
         }
         assert_eq!(player.latest_card(), &Card::_last_card())
+    }
+
+    pub fn check_valid_moves() {
+        let mut player = Player::new(500, 0);
+        let mut deck = Deck::new();
+        player.get_cards(&mut deck, 2);
+        assert!(player.valid_moves().contains(&Action::Hit));
+        assert!(player.valid_moves().contains(&Action::Stand));
+        assert!(player.valid_moves().contains(&Action::Surrender));
+        assert!(player.valid_moves().contains(&Action::DoubleDown));
+        player.bet(240);
+        assert!(player.valid_moves().contains(&Action::DoubleDown));
+        player.bet(80);
+        assert!(!player.valid_moves().contains(&Action::DoubleDown));
+        player.get_cards(&mut deck, 1);
+        assert!(!player.valid_moves().contains(&Action::Surrender));
     }
 
     pub fn make_bet() {

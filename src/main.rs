@@ -3,8 +3,8 @@ mod player;
 mod io;
 
 use deck::Deck;
-use player::{ Player, PlayerList, ValidMove };
-use io::get_clamped_user_int;
+use player::{ Player, PlayerList, Action };
+use io::{ get_clamped_user_int, get_user_action };
 
 const MAX_PLAYERS: u8 = 8;
 const CHIPS_CLAMP: [u32; 2] = [100, 1000];
@@ -60,12 +60,8 @@ fn game_loop(options: (u8, u32, u32)) {
             println!("Your cards: {}, {}", player.hand[0], player.hand[1]);
             println!("Dealer upcard: {}", dealer.hand[0]);
             loop {
-                match get_clamped_user_int(
-                    Some("Type 1 to Hit, 0 to Stand"), 
-                    0, 
-                    1,
-                ) {
-                    1 => {
+                match get_user_action(player) {
+                    Action::Hit => {
                         player.get_cards(&mut deck, 1);
                         println!("{}", player.latest_card());
                         if player.hand_total() > 21 {
@@ -73,6 +69,7 @@ fn game_loop(options: (u8, u32, u32)) {
                             break;
                         }
                     },
+                    Action::Stand => break,
                     _ => break,
                 }
             }

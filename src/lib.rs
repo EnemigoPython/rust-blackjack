@@ -38,6 +38,11 @@ mod tests {
     }
 
     #[test]
+    fn check_valid_moves() {
+        player_tests::check_valid_moves();
+    }
+
+    #[test]
     fn make_bet() {
         player_tests::make_bet();
     }
