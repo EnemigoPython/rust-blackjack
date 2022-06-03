@@ -42,12 +42,12 @@ pub fn get_clamped_user_int<T>(prompt: Option<&str>, min: T, max: T) -> T
 
 #[allow(dead_code)]
 pub fn get_user_action(player: &mut Player) -> Action {
-    let mut prompt = String::new();
+    let mut prompt = String::from("Type the number of your desired action:");
     let valid_moves = player.valid_moves();
     for (i, valid_move) in valid_moves.iter().enumerate() {
         prompt.push_str(
             &format!(
-                "{}: {}\n", 
+                "\n{}: {}", 
                 i,
                 match valid_move {
                     Action::Hit => "Hit",

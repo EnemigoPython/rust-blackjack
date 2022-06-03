@@ -66,11 +66,18 @@ fn game_loop(options: (u8, u32, u32)) {
                         println!("{}", player.latest_card());
                         if player.hand_total() > 21 {
                             println!("You went bust!");
+                            player.resolve_bet(0).unwrap();
                             break;
                         }
                     },
                     Action::Stand => break,
-                    _ => break,
+                    Action::Surrender => {
+                        player.surrender_bet();
+                        break;
+                    },
+                    Action::DoubleDown => { 
+                        break;
+                    },
                 }
             }
         }

@@ -81,9 +81,18 @@ impl Player {
         Ok(amount)
     }
 
+    pub fn surrender_bet(&mut self) {
+       self.resolve_bet(self.pot.unwrap() / 2).unwrap();
+    }
+
+    pub fn double_down(&mut self) {
+        self.bet(self.pot.unwrap()).unwrap();
+    }
+
     pub fn resolve_bet(&mut self, amount: u32) -> Result<u32, &str> {
         match self.pot {
             Some(n) if n <= 0 => return Err("Tried to resolve when no bet was made"),
+            None => return Err("Tried to resolve bet on a dealer"),
             _ => (),
         }
         if let Some(chips) = self.chips.as_mut() {
@@ -97,11 +106,11 @@ impl Player {
     }
 
     pub fn is_in_pot(&self) -> bool {
-        self.pot != Some(0)
+        self.pot.unwrap() > 0
     }
 
-    pub fn is_busted(&self) -> bool {
-        self.chips == Some(0)
+    pub fn is_broke(&self) -> bool {
+        self.chips.unwrap() == 0
     }
 }
 
@@ -190,10 +199,15 @@ pub mod tests {
         assert_eq!(legal_bet_result, Ok(10));
         assert_eq!(player.pot, Some(10));
         assert_eq!(player.chips, Some(10));
-        assert_ne!(player.is_busted(), true);
+        assert_ne!(player.is_broke(), true);
         player.bet(10);
         assert_eq!(player.chips, Some(0));
-        assert_eq!(player.is_busted(), true);
+        assert_eq!(player.is_broke(), true);
+        player.resolve_bet(0);
+        player.chips = Some(50);
+        player.bet(10);
+        player.double_down();
+        assert_eq!(player.pot, Some(20));
     }
 
     pub fn resolve_bet() {
@@ -209,6 +223,12 @@ pub mod tests {
         player.resolve_bet(70);
         assert_eq!(player.chips, Some(120));
         assert_eq!(player.pot, Some(0));
+        player.bet(100);
+        player.surrender_bet();
+        assert_eq!(player.chips, Some(70));
+        let mut dealer = Player::new(0, 0);
+        let dealer_resolve_bet_result = dealer.resolve_bet(0);
+        assert_eq!(dealer_resolve_bet_result, Err("Tried to resolve bet on a dealer"));
     }
 
     pub fn create_player_list() {
