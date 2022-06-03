@@ -3,7 +3,7 @@ mod player;
 mod io;
 
 use deck::Deck;
-use player::{ Player, PlayerList, Action };
+use player::{ Player, PlayerList, Action, BetResult };
 use io::{ get_clamped_user_int, get_user_action };
 
 const MAX_PLAYERS: u8 = 8;
@@ -47,7 +47,7 @@ fn game_loop(options: (u8, u32, u32)) {
                     Some(&format!("How much would you like to bet? (minimum bet {})", min_bet)), 
                     min_bet, 
                     player.chips.unwrap(),
-                )
+                ),
             };
             player.bet(bet).unwrap();
         }
@@ -63,19 +63,20 @@ fn game_loop(options: (u8, u32, u32)) {
                 match get_user_action(player) {
                     Action::Hit => {
                         player.get_cards(&mut deck, 1);
-                        println!("{}", player.latest_card());
+                        println!("You get the {}", player.latest_card());
                         if player.hand_total() > 21 {
                             println!("You went bust!");
-                            player.resolve_bet(0).unwrap();
+                            player.resolve_bet(BetResult::Lose).unwrap();
                             break;
                         }
                     },
                     Action::Stand => break,
                     Action::Surrender => {
-                        player.surrender_bet();
+                        player.resolve_bet(BetResult::Surrender).unwrap();
                         break;
                     },
                     Action::DoubleDown => { 
+                        player.double_down();
                         break;
                     },
                 }
@@ -89,7 +90,7 @@ fn game_loop(options: (u8, u32, u32)) {
                 println!("Dealer busts!");
             }
         }
-        for player in player_list.iter_mut() {
+        for player in player_list.iter_mut().filter(|p| p.is_in_pot()) {
             match dealer.hand_total() {
                 n if n > 21 || n < player.hand_total() => {
 

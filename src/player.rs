@@ -9,6 +9,14 @@ pub enum Action {
     DoubleDown,
 }
 
+pub enum BetResult {
+    Win,
+    Lose,
+    Surrender,
+    StandOff,
+    Blackjack,
+}
+
 pub struct Player {
     pub hand: Vec<Card>,
     pub chips: Option<u32>,
@@ -35,7 +43,8 @@ impl Player {
         let mut valid_moves = vec![Action::Hit, Action::Stand];
         if self.hand.len() == 2 {
             valid_moves.push(Action::Surrender);
-            if self.chips >= self.pot {
+            let double_down_range = 9..=11;
+            if self.chips >= self.pot && double_down_range.contains(&self.hand_total()) {
                 valid_moves.push(Action::DoubleDown);
             }
         }
@@ -81,20 +90,23 @@ impl Player {
         Ok(amount)
     }
 
-    pub fn surrender_bet(&mut self) {
-       self.resolve_bet(self.pot.unwrap() / 2).unwrap();
-    }
-
     pub fn double_down(&mut self) {
         self.bet(self.pot.unwrap()).unwrap();
     }
 
-    pub fn resolve_bet(&mut self, amount: u32) -> Result<u32, &str> {
+    pub fn resolve_bet(&mut self, result: BetResult) -> Result<u32, &str> {
         match self.pot {
             Some(n) if n <= 0 => return Err("Tried to resolve when no bet was made"),
             None => return Err("Tried to resolve bet on a dealer"),
             _ => (),
         }
+        let amount = match result {
+            BetResult::Win => self.pot.unwrap() * 2,
+            BetResult::Lose => 0,
+            BetResult::Surrender => self.pot.unwrap() / 2,
+            BetResult::Blackjack => (self.pot.unwrap() as f32 * 2.5) as u32,
+            BetResult::StandOff => self.pot.unwrap(),
+        };
         if let Some(chips) = self.chips.as_mut() {
             *chips += amount;
         }
@@ -175,6 +187,7 @@ pub mod tests {
     pub fn check_valid_moves() {
         let mut player = Player::new(500, 0);
         let mut deck = Deck::new();
+        deck.deal(2);
         player.get_cards(&mut deck, 2);
         assert!(player.valid_moves().contains(&Action::Hit));
         assert!(player.valid_moves().contains(&Action::Stand));
@@ -203,7 +216,7 @@ pub mod tests {
         player.bet(10);
         assert_eq!(player.chips, Some(0));
         assert_eq!(player.is_broke(), true);
-        player.resolve_bet(0);
+        player.resolve_bet(BetResult::Lose);
         player.chips = Some(50);
         player.bet(10);
         player.double_down();
@@ -212,22 +225,25 @@ pub mod tests {
 
     pub fn resolve_bet() {
         let mut player = Player::new(100, 0);
-        let no_bet_result = player.resolve_bet(10);
+        let no_bet_result = player.resolve_bet(BetResult::StandOff);
         assert_eq!(no_bet_result, Err("Tried to resolve when no bet was made"));
         player.bet(30);
-        let normal_bet_result = player.resolve_bet(30);
+        let normal_bet_result = player.resolve_bet(BetResult::StandOff);
         assert_eq!(normal_bet_result, Ok(30));
         assert_eq!(player.chips, Some(100));
         assert_eq!(player.pot, Some(0));
         player.bet(50);
-        player.resolve_bet(70);
-        assert_eq!(player.chips, Some(120));
+        player.resolve_bet(BetResult::Win);
+        assert_eq!(player.chips, Some(150));
         assert_eq!(player.pot, Some(0));
         player.bet(100);
-        player.surrender_bet();
-        assert_eq!(player.chips, Some(70));
+        player.resolve_bet(BetResult::Surrender);
+        assert_eq!(player.chips, Some(100));
+        player.bet(10);
+        player.resolve_bet(BetResult::Blackjack);
+        assert_eq!(player.chips, Some(115));
         let mut dealer = Player::new(0, 0);
-        let dealer_resolve_bet_result = dealer.resolve_bet(0);
+        let dealer_resolve_bet_result = dealer.resolve_bet(BetResult::Lose);
         assert_eq!(dealer_resolve_bet_result, Err("Tried to resolve bet on a dealer"));
     }
 
