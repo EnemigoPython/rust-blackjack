@@ -77,7 +77,27 @@ impl Player {
         if let Some(pot) = self.pot.as_mut() {
             *pot += amount;
         } 
+
         Ok(amount)
+    }
+
+    pub fn resolve_bet(&mut self, amount: u32) -> Result<u32, &str> {
+        match self.pot {
+            Some(n) if n <= 0 => return Err("Tried to resolve when no bet was made"),
+            _ => (),
+        }
+        if let Some(chips) = self.chips.as_mut() {
+            *chips += amount;
+        }
+        if let Some(pot) = self.pot.as_mut() {
+            *pot = 0;
+        }
+
+        Ok(amount)
+    }
+
+    pub fn is_in_pot(&self) -> bool {
+        self.pot != Some(0)
     }
 
     pub fn is_busted(&self) -> bool {
@@ -174,6 +194,21 @@ pub mod tests {
         player.bet(10);
         assert_eq!(player.chips, Some(0));
         assert_eq!(player.is_busted(), true);
+    }
+
+    pub fn resolve_bet() {
+        let mut player = Player::new(100, 0);
+        let no_bet_result = player.resolve_bet(10);
+        assert_eq!(no_bet_result, Err("Tried to resolve when no bet was made"));
+        player.bet(30);
+        let normal_bet_result = player.resolve_bet(30);
+        assert_eq!(normal_bet_result, Ok(30));
+        assert_eq!(player.chips, Some(100));
+        assert_eq!(player.pot, Some(0));
+        player.bet(50);
+        player.resolve_bet(70);
+        assert_eq!(player.chips, Some(120));
+        assert_eq!(player.pot, Some(0));
     }
 
     pub fn create_player_list() {

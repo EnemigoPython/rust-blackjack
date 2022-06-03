@@ -48,6 +48,11 @@ mod tests {
     }
 
     #[test]
+    fn resolve_bet() {
+        player_tests::resolve_bet();
+    }
+
+    #[test]
     fn create_player_list() {
         player_tests::create_player_list();
     }
