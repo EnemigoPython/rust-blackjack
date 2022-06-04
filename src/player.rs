@@ -153,7 +153,9 @@ impl PlayerList {
     }
 
     pub fn players_left(&self) -> bool {
-        self.0.len() > 0
+        self.0.iter()
+            .filter(|p| !p.is_broke())
+            .count() > 0
     }
 }
 

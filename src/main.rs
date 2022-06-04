@@ -39,7 +39,7 @@ fn game_loop(options: (u8, u32, u32)) {
     loop {
         round += 1;
         println!("\nRound {}", round);
-        for player in player_list.iter_mut() {
+        for player in player_list.iter_mut().filter(|p| !p.is_broke()) {
             println!("\n{} to bet, chips: {}", player, player.chips.unwrap());
             let bet = match player.chips.unwrap() {
                 n if n <= min_bet => n,
@@ -54,7 +54,7 @@ fn game_loop(options: (u8, u32, u32)) {
         let mut deck = Deck::new();
         deck.shuffle();
         dealer.get_cards(&mut deck, 2);
-        for player in player_list.iter_mut() {
+        for player in player_list.iter_mut().filter(|p| !p.is_broke()) {
             player.get_cards(&mut deck, 2);
             println!("\n{}'s turn:", player);
             println!("Your cards: {}, {}", player.hand[0], player.hand[1]);
@@ -77,7 +77,8 @@ fn game_loop(options: (u8, u32, u32)) {
                     },
                     Action::DoubleDown => { 
                         player.double_down();
-                        break;
+                        player.get_cards(&mut deck, 1);
+                        println!("You get the {}", player.latest_card());
                     },
                 }
             }
@@ -92,13 +93,22 @@ fn game_loop(options: (u8, u32, u32)) {
         }
         for player in player_list.iter_mut().filter(|p| p.is_in_pot()) {
             match dealer.hand_total() {
+                _ if !dealer.has_blackjack() && player.has_blackjack() => {
+                    println!("Blackjack for {}!", player);
+                    player.resolve_bet(BetResult::Blackjack).unwrap();
+                }
                 n if n > 21 || n < player.hand_total() => {
-
+                    println!("{} wins!", player);
+                    player.resolve_bet(BetResult::Win).unwrap();
                 },
                 n if n == player.hand_total() => {
-
+                    println!("Stand-off for {}", player);
+                    player.resolve_bet(BetResult::StandOff).unwrap();
                 },
-                _ => (),
+                _ => {
+                    println!("{} loses", player);
+                    player.resolve_bet(BetResult::Lose).unwrap();
+                },
             }
         }
         if !player_list.players_left() { 
