@@ -115,6 +115,7 @@ fn game_loop(options: (u8, u32, u32)) {
             sleep(1);
         }
         player_list.clear_cards();
+        dealer.hand = Vec::new();
         if !player_list.players_left() { 
             break;
         }

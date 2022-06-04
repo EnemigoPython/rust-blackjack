@@ -281,7 +281,7 @@ pub mod tests {
             assert_eq!(format!("{}", player), format!("Player {}", i+1));
             assert_eq!(player.chips, Some(100));
         }
-        assert_eq!(true, player_list.players_left());
+        assert!(player_list.players_left());
     }
 
     pub fn clear_player_cards() {
