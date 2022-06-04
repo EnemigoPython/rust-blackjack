@@ -1,5 +1,5 @@
 # rust-blackjack
-A Blackjack CLI game written in Rust, as a learning experience.
+A Blackjack CLI game written in Rust used to learn the fundamentals of Rust.
 
 # instructions
 If you already have Rust and Cargo, clone the repo and run `cargo run`.
