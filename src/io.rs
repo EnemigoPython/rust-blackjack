@@ -1,5 +1,5 @@
 use crate::player::{ Player, Action };
-use std::{ io, str };
+use std::{ io, str, thread, time };
 
 #[allow(dead_code)]
 fn get_user_str(prompt: Option<&str>) -> String {
@@ -61,4 +61,10 @@ pub fn get_user_action(player: &mut Player) -> Action {
     let option = get_clamped_user_int(Some(&prompt), 0, valid_moves.len());
 
     valid_moves[option].clone()
+}
+
+#[allow(dead_code)]
+pub fn sleep(duration: u64) {
+    let time = time::Duration::from_secs(duration);
+    thread::sleep(time);
 }

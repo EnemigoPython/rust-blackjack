@@ -4,7 +4,7 @@ mod io;
 
 use deck::Deck;
 use player::{ Player, PlayerList, Action, BetResult };
-use io::{ get_clamped_user_int, get_user_action };
+use io::{ get_clamped_user_int, get_user_action, sleep };
 
 const MAX_PLAYERS: u8 = 8;
 const CHIPS_CLAMP: [u32; 2] = [100, 1000];
@@ -57,15 +57,15 @@ fn game_loop(options: (u8, u32, u32)) {
         for player in player_list.iter_mut().filter(|p| !p.is_broke()) {
             player.get_cards(&mut deck, 2);
             println!("\n{}'s turn:", player);
-            println!("Your cards: {}, {}", player.hand[0], player.hand[1]);
+            println!("Your cards: {}, {} (total: {})", player.hand[0], player.hand[1], player.hand_total());
             println!("Dealer upcard: {}", dealer.hand[0]);
             loop {
                 match get_user_action(player) {
                     Action::Hit => {
                         player.get_cards(&mut deck, 1);
-                        println!("You get the {}", player.latest_card());
+                        println!("You get the {} (total: {})", player.latest_card(), player.hand_total());
                         if player.hand_total() > 21 {
-                            println!("You went bust!");
+                            println!("You went bust!\n");
                             player.resolve_bet(BetResult::Lose).unwrap();
                             break;
                         }
@@ -81,36 +81,40 @@ fn game_loop(options: (u8, u32, u32)) {
                         println!("You get the {}", player.latest_card());
                     },
                 }
+                sleep(1);
             }
         }
-        println!("Dealer shows the {}", dealer.hand[1]);
+        println!("\nDealer shows the {} (total: {})", dealer.hand[1], dealer.hand_total());
         while dealer.hand_total() < 17 {
             dealer.get_cards(&mut deck, 1);
-            println!("Dealer gets the {}", dealer.latest_card());
+            println!("Dealer gets the {} (total: {})", dealer.latest_card(), dealer.hand_total());
             if dealer.hand_total() > 21 {
                 println!("Dealer busts!");
             }
+            sleep(1);
         }
         for player in player_list.iter_mut().filter(|p| p.is_in_pot()) {
             match dealer.hand_total() {
                 _ if !dealer.has_blackjack() && player.has_blackjack() => {
-                    println!("Blackjack for {}!", player);
+                    println!("\nBlackjack for {}!", player);
                     player.resolve_bet(BetResult::Blackjack).unwrap();
                 }
                 n if n > 21 || n < player.hand_total() => {
-                    println!("{} wins!", player);
+                    println!("\n{} wins!", player);
                     player.resolve_bet(BetResult::Win).unwrap();
                 },
                 n if n == player.hand_total() => {
-                    println!("Stand-off for {}", player);
+                    println!("\nStand-off for {}", player);
                     player.resolve_bet(BetResult::StandOff).unwrap();
                 },
                 _ => {
-                    println!("{} loses", player);
+                    println!("\n{} loses", player);
                     player.resolve_bet(BetResult::Lose).unwrap();
                 },
             }
+            sleep(1);
         }
+        player_list.clear_cards();
         if !player_list.players_left() { 
             break;
         }

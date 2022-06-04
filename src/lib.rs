@@ -48,6 +48,11 @@ mod tests {
     }
 
     #[test]
+    fn check_player_state() {
+        player_tests::check_player_state();
+    }
+
+    #[test]
     fn resolve_bet() {
         player_tests::resolve_bet();
     }
@@ -55,5 +60,10 @@ mod tests {
     #[test]
     fn create_player_list() {
         player_tests::create_player_list();
+    }
+
+    #[test]
+    fn clear_player_cards() {
+        player_tests::clear_player_cards();
     }
 }

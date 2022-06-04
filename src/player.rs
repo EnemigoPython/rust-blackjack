@@ -157,6 +157,12 @@ impl PlayerList {
             .filter(|p| !p.is_broke())
             .count() > 0
     }
+
+    pub fn clear_cards(&mut self) {
+        for player in self.iter_mut() {
+            player.hand = Vec::new();
+        }
+    }
 }
 
 
@@ -218,15 +224,31 @@ pub mod tests {
         assert_eq!(legal_bet_result, Ok(10));
         assert_eq!(player.pot, Some(10));
         assert_eq!(player.chips, Some(10));
-        assert_ne!(player.is_broke(), true);
+        assert!(!player.is_broke());
         player.bet(10);
         assert_eq!(player.chips, Some(0));
-        assert_eq!(player.is_broke(), true);
+        assert!(player.is_broke());
         player.resolve_bet(BetResult::Lose);
         player.chips = Some(50);
         player.bet(10);
         player.double_down();
         assert_eq!(player.pot, Some(20));
+    }
+
+    pub fn check_player_state() {
+        let mut player = Player::new(100, 0);
+        let mut deck = Deck::new();
+        assert!(!player.is_in_pot());
+        player.bet(20);
+        assert!(player.is_in_pot());
+        player.resolve_bet(BetResult::Lose);
+        assert!(!player.is_in_pot());
+        player.get_cards(&mut deck, 2);
+        assert!(!player.has_blackjack());
+        deck.deal(9);
+        let mut second_player = Player::new(100, 1);
+        second_player.get_cards(&mut deck, 2);
+        assert!(second_player.has_blackjack());
     }
 
     pub fn resolve_bet() {
@@ -260,5 +282,18 @@ pub mod tests {
             assert_eq!(player.chips, Some(100));
         }
         assert_eq!(true, player_list.players_left());
+    }
+
+    pub fn clear_player_cards() {
+        let mut deck = Deck::new();
+        let mut player_list = PlayerList::new(5, 100);
+        for player in player_list.iter_mut() {
+            player.get_cards(&mut deck, 2);
+            assert_eq!(player.hand.len(), 2);
+        }
+        player_list.clear_cards();
+        for player in player_list.iter_mut() {
+            assert_eq!(player.hand.len(), 0);
+        }
     }
 }
